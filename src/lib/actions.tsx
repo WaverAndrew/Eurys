@@ -1,0 +1,79 @@
+"use server";
+
+import { generateObject } from "ai";
+import { openai } from "@ai-sdk/openai";
+import { z } from "zod";
+import { type } from "os";
+import { NotificationsObject, Notification } from "./types";
+
+export async function getAIGeneration(input: string, context: string) {
+  "use server";
+  const prompt = `QUESTION : ${input}; PROFILES DATA: ${context}`;
+
+  const { object: profiles } = await generateObject({
+    model: openai("gpt-4o-mini"),
+    temperature: 0.4,
+    system: `You are an AI assistant specialized in analyzing profiles of different individuals to answer questions based on the provided data. Your goal is to be kind, helpful, and thorough in your responses. For each question, you will:
+      - Select profiles that are with 100% certainty relevant to the question.
+      - Provide a thoughtful and complete answer based solely on the information in the selected profiles.
+      - Ensure that if no profiles are relevant, you respond with NO MATCH.
+      - Your output should only include information from the relevant profiles and should strictly adhere to the provided data without using any external information.`,
+    prompt: prompt,
+
+    schema: z.object({
+      profiles: z.array(
+        z.object({
+          name: z
+            .string()
+            .describe("Name of the relevant profile (only if relevant)"),
+          reason: z
+            .string()
+            .describe(
+              "Why and how the profile answers the question (only if relevant)"
+            ),
+        })
+      ),
+    }),
+  });
+
+  return { profiles };
+}
+
+export async function ParseAiObject(name: string, reason: string) {}
+
+export const formatContextString = (data: any[]) => {
+  return data
+    .map((item) => {
+      const { id, name, text, type, skills, languages } = item.metadata;
+      return `{ID: ${id}, Name: ${name}, Data: ${text}, Type of data: ${type}${
+        skills ? `, Skills: ${skills}` : ""
+      }${languages ? `, Languages: ${languages}` : ""}}, `;
+    })
+    .join("\n");
+};
+
+export async function extractNamesAndTexts(obj: NotificationsObject): Promise<{
+  names: string[];
+  texts: string[];
+}> {
+  // Initialize arrays for names and texts
+  const names: string[] = [];
+  const texts: string[] = [];
+
+  // Check if the object has the expected structure and contains profiles
+  if (obj.profiles?.profiles?.length) {
+    // Destructure to get the notifications array
+    const {
+      profiles: { profiles },
+    } = obj;
+
+    // Iterate over all notifications to extract name and reason
+    profiles.forEach((profile: Notification) => {
+      names.push(profile.name);
+      texts.push(profile.reason);
+    });
+  }
+
+  // Return an object with two arrays
+  return { names, texts };
+}
