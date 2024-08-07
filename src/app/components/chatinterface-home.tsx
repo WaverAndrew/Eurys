@@ -13,7 +13,6 @@ import { FlipWords } from "@/components/ui/flipping-words";
 import { Person } from "@/lib/types";
 import { Spotlight } from "@/components/ui/spotlight";
 import { useClerk, useUser } from "@clerk/nextjs";
-import { SetCredits } from "@/lib/actions";
 
 export default function ChatInterface() {
   const { isLoaded, isSignedIn, user } = useUser();
