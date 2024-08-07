@@ -23,7 +23,7 @@ export function CardUI({ person }: CardProps) {
       return "https://images.unsplash.com/photo-1657128344786-360c3f8e57e5?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
     }
     if (name === "Rahul Mehta") {
-      return "https://images.unsplash.com/photo-1695033328827-0713c71475dc?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
+      return "https://images.unsplash.com/photo-1695033328827-0713c71475dc?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3DQ!";
     }
     if (name === "Alex Chen") {
       return "https://images.unsplash.com/photo-1697667602907-3d6ff0dfbf01?q=80&w=3087&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";

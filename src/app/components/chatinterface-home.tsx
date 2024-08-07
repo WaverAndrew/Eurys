@@ -12,16 +12,18 @@ import { useRouter } from "next/navigation";
 import { FlipWords } from "@/components/ui/flipping-words";
 import { Person } from "@/lib/types";
 import { Spotlight } from "@/components/ui/spotlight";
+import { useClerk, useUser } from "@clerk/nextjs";
+import { SetCredits } from "@/lib/actions";
 
 export default function ChatInterface() {
+  const { isLoaded, isSignedIn, user } = useUser();
+  const { openSignIn, session } = useClerk();
   const router = useRouter();
   const [input, setInput] = useState<string>("");
   const [timetoquery, setTimetoQuery] = useState(true);
   const [showEmptyScreen, setShowEmptyScreen] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const words = ["business\xa0partner", "friend", "investor", "co-founder"];
-
-  // test users
 
   useEffect(() => {
     // Focus on input when the page loads
@@ -43,6 +45,15 @@ export default function ChatInterface() {
     }
   };
 
+  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (isSignedIn) {
+      handleSubmit(e);
+    } else {
+      openSignIn();
+    }
+  }
+
   return (
     <>
       <Spotlight
@@ -58,7 +69,7 @@ export default function ChatInterface() {
 
         <form
           className="max-w-2xl w-full px-6 flex flex-col items-center"
-          onSubmit={handleSubmit}
+          onSubmit={onSubmit}
         >
           <div className="relative w-full">
             <Textarea

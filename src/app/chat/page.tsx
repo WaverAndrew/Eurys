@@ -5,11 +5,14 @@ import { Person } from "@/lib/types";
 import { useQuery } from "@tanstack/react-query";
 import QueryInterface from "@/app/components/queryinterface-chat";
 import {
+  CheckCredits,
+  DeductCredits,
   extractNamesAndTexts,
   formatContextString,
   getAIGeneration,
 } from "@/lib/actions";
 import { PineRetrival } from "@/lib/pinecone";
+import { useClerk, useUser } from "@clerk/nextjs";
 
 interface QueryResult {
   persons: Person[];
@@ -22,35 +25,42 @@ export default function ChatPage() {
   const query = searchParams.get("query");
   const [userQuery, setUserQuery] = useState(query || "");
   const isFirstRender = useRef(true);
+  // Set default credits to 30 if undefined
 
   const fetchUsers = async (q: string): Promise<QueryResult> => {
-    //Get the relevant context
-    const context = await PineRetrival(q);
+    const credits = await CheckCredits();
+    if (Number(credits) > 0) {
+      const suc = await DeductCredits(credits!);
 
-    console.log(context);
+      // Get the relevant context
+      const context = await PineRetrival(q);
 
-    //Parse the context
-    const finalcontext = await formatContextString(context);
+      // Parse the context
+      const finalcontext = await formatContextString(context);
 
-    //get the Ai generation
-    const generatedobject = await getAIGeneration(q, finalcontext);
+      // Get the AI generation
+      const generatedobject = await getAIGeneration(q, finalcontext);
 
-    //Parse the ai response
-    const { names: final_users, texts: final_reasons } =
-      await extractNamesAndTexts(generatedobject);
+      // Parse the AI response
+      const { names: final_users, texts: final_reasons } =
+        await extractNamesAndTexts(generatedobject);
 
-    console.log(final_users);
+      // Create Person objects from final_users
+      const persons: Person[] = final_users.map((name, index) => ({
+        id: index.toString(),
+        name: name,
+        // Add other required fields for Person type if necessary
+      }));
 
-    // Create Person objects from final_users
-    const persons: Person[] = final_users.map((name, index) => ({
-      id: index.toString(),
-      name: name,
-      // Add other required fields for Person type if necessary
-    }));
+      // Join final_reasons into a single string for rendering
 
-    // Join final_reasons into a single string for rendering
-    console.log("FUNCTION CALL ENTERED");
-    return { persons, rendered_answer: final_reasons };
+      return { persons, rendered_answer: final_reasons };
+    } else {
+      const persons: Person[] = [];
+      const rendered_answer: string[] = ["EMPTY CREDITS"];
+
+      return { persons, rendered_answer };
+    }
   };
 
   const { data: queryResult, isLoading } = useQuery<QueryResult>({

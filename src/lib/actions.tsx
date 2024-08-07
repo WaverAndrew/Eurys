@@ -5,6 +5,7 @@ import { openai } from "@ai-sdk/openai";
 import { z } from "zod";
 import { type } from "os";
 import { NotificationsObject, Notification } from "./types";
+import { clerkClient, currentUser } from "@clerk/nextjs/server";
 
 export async function getAIGeneration(input: string, context: string) {
   "use server";
@@ -76,4 +77,29 @@ export async function extractNamesAndTexts(obj: NotificationsObject): Promise<{
 
   // Return an object with two arrays
   return { names, texts };
+}
+
+//METADATA AND CREDITS SYSTEM
+
+export async function DeductCredits(credits: number) {
+  const user = await currentUser();
+  if (user) {
+    //const credits = Number(user.publicMetadata?.credits ?? 30)
+    await clerkClient.users.updateUserMetadata(user.id, {
+      publicMetadata: {
+        credits: credits - 1,
+      },
+    });
+
+    return { success: true, c: credits };
+  } else {
+    return { success: false };
+  }
+}
+
+export async function CheckCredits() {
+  const user = await currentUser();
+
+  const credits = Number(user?.publicMetadata?.credits ?? 30);
+  return credits;
 }
