@@ -29,7 +29,13 @@ export default function RootLayout({
     <ClerkProvider>
       <>
         <html lang="en">
-          <body className={cn("font-sans antialiased", fontSans.variable)}>
+          <body
+            className={cn(
+              "font-sans antialiased",
+              fontSans.variable,
+              "overflow-hidden"
+            )}
+          >
             <Providers>
               <ThemeProvider
                 attribute="class"
@@ -38,13 +44,11 @@ export default function RootLayout({
                 disableTransitionOnChange
               >
                 <div className="flex flex-col min-h-screen relative">
-                  {/* Ensure header has a higher z-index */}
                   <header className="relative z-10">
                     <Header />
                   </header>
-                  <main className="flex-grow">
+                  <main className="flex-grow overflow-hidden">
                     <div className="h-[50rem] w-full dark:bg-black bg-white dark:bg-dot-white/[0.2] bg-dot-black/[0.2] relative flex items-center justify-center">
-                      {/* Radial gradient for the container to give a faded look */}
                       <div className="absolute inset-0 flex items-center justify-center dark:bg-black bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
                       {children}
                     </div>
