@@ -3,7 +3,7 @@
 import Image from "next/image";
 import React from "react";
 import { CardBody, CardContainer, CardItem } from "@/components/ui/cardd";
-import Link from "next/link";
+
 import { Person } from "@/lib/types";
 
 interface CardProps {
