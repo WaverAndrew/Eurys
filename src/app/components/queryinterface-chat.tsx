@@ -56,7 +56,10 @@ function QueryInterface({
             <div className="pt-10">
               <div className="pb-5">
                 {rendered_answer.map((item, index) => (
-                  <h1 className="text-gray-200 text-lg leading-relaxed max-w-3xl mx-auto mt-6 mb-8 px-4 sm:px-6 lg:px-4">
+                  <h1
+                    className="text-gray-200 text-lg leading-relaxed max-w-3xl mx-auto mt-6 mb-8 px-4 sm:px-6 lg:px-4"
+                    key={index}
+                  >
                     {item}
                   </h1>
                 ))}

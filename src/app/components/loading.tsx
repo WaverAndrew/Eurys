@@ -24,7 +24,7 @@ export default function LoadingPage() {
         ))}
       </div>
       {Array.from({ length: 5 }).map((_, index) => (
-        <Skeleton className="h-6 w-[60%] my-3" />
+        <Skeleton className="h-6 w-[60%] my-3" key={index} />
       ))}
     </div>
   );
