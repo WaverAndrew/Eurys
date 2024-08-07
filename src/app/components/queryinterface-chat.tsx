@@ -14,7 +14,6 @@ interface Queryprops {
   users: Person[];
   isLoading: boolean;
   rendered_answer: string[];
-  //CREATE USERS CLASS
 }
 
 function QueryInterface({
@@ -31,8 +30,8 @@ function QueryInterface({
   };
 
   return (
-    <div className="fixed inset-0 flex items-start justify-start pt-10 pl-[5vw]">
-      <div className="w-full max-w-screen-lg mx-auto mt-4">
+    <div className="fixed inset-0 flex items-start justify-start pt-10 pl-[5vw] overflow-hidden">
+      <div className="w-full max-w-screen-lg mx-auto mt-4 overflow-auto h-full">
         <div className="flex items-center">
           <ArrowButton onClick={() => router.push("/")} />
           <div className="pb-3">
@@ -48,7 +47,7 @@ function QueryInterface({
           </div>
         ) : (
           <>
-            <div className="flex overflow-x-scroll">
+            <div className="flex overflow-x-auto pb-5">
               {users.map((item) => (
                 <CardUI key={item.id} person={item} />
               ))}
