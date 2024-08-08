@@ -27,6 +27,11 @@ export async function getAIGeneration(input: string, context: string) {
           name: z
             .string()
             .describe("Name of the relevant profile (only if relevant)"),
+          image: z
+            .string()
+            .describe(
+              "link to the image url in context, if not present write 'none'"
+            ),
           reason: z
             .string()
             .describe(
@@ -45,10 +50,12 @@ export async function ParseAiObject(name: string, reason: string) {}
 export const formatContextString = (data: any[]) => {
   return data
     .map((item) => {
-      const { id, name, text, type, skills, languages } = item.metadata;
+      const { id, name, text, type, skills, languages, image } = item.metadata;
       return `{ID: ${id}, Name: ${name}, Data: ${text}, Type of data: ${type}${
         skills ? `, Skills: ${skills}` : ""
-      }${languages ? `, Languages: ${languages}` : ""}}, `;
+      }${languages ? `, Languages: ${languages}` : ""}${
+        image ? `, Image: ${image}` : ""
+      }}, `;
     })
     .join("\n");
 };
@@ -56,9 +63,11 @@ export const formatContextString = (data: any[]) => {
 export async function extractNamesAndTexts(obj: NotificationsObject): Promise<{
   names: string[];
   texts: string[];
+  images: string[];
 }> {
   // Initialize arrays for names and texts
   const names: string[] = [];
+  const images: string[] = [];
   const texts: string[] = [];
 
   // Check if the object has the expected structure and contains profiles
@@ -71,12 +80,13 @@ export async function extractNamesAndTexts(obj: NotificationsObject): Promise<{
     // Iterate over all notifications to extract name and reason
     profiles.forEach((profile: Notification) => {
       names.push(profile.name);
+      images.push(profile.image);
       texts.push(profile.reason);
     });
   }
 
   // Return an object with two arrays
-  return { names, texts };
+  return { names, images, texts };
 }
 
 //METADATA AND CREDITS SYSTEM

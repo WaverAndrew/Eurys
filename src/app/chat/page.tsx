@@ -42,13 +42,17 @@ export default function ChatPage() {
       const generatedobject = await getAIGeneration(q, finalcontext);
 
       // Parse the AI response
-      const { names: final_users, texts: final_reasons } =
-        await extractNamesAndTexts(generatedobject);
+      const {
+        names: final_users,
+        texts: final_reasons,
+        images,
+      } = await extractNamesAndTexts(generatedobject);
 
       // Create Person objects from final_users
       const persons: Person[] = final_users.map((name, index) => ({
         id: index.toString(),
         name: name,
+        img: images[index] !== "none" ? images[index] : "",
         // Add other required fields for Person type if necessary
       }));
 

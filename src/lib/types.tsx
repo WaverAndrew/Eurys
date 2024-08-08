@@ -14,6 +14,7 @@ export type AIResponseObject = {
 
 export interface Notification {
   name: string;
+  image: string;
   reason: string;
 }
 
