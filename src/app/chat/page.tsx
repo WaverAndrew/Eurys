@@ -10,6 +10,7 @@ import {
   extractNamesAndTexts,
   formatContextString,
   getAIGeneration,
+  relevancyTest,
 } from "@/lib/actions";
 import { PineRetrival } from "@/lib/pinecone";
 import { useClerk, useUser } from "@clerk/nextjs";
@@ -28,41 +29,48 @@ export default function ChatPage() {
   // Set default credits to 30 if undefined
 
   const fetchUsers = async (q: string): Promise<QueryResult> => {
-    const credits = await CheckCredits();
-    if (Number(credits) > 0) {
-      const suc = await DeductCredits(credits!);
+    const approved = await relevancyTest(q);
+    if (approved) {
+      const credits = await CheckCredits();
+      if (Number(credits) > 0) {
+        const suc = await DeductCredits(credits!);
 
-      // Get the relevant context
-      const context = await PineRetrival(q);
+        // Get the relevant context
+        const context = await PineRetrival(q);
 
-      // Parse the context
-      const finalcontext = await formatContextString(context);
+        // Parse the context
+        const finalcontext = await formatContextString(context);
 
-      // Get the AI generation
-      const generatedobject = await getAIGeneration(q, finalcontext);
+        // Get the AI generation
+        const generatedobject = await getAIGeneration(q, finalcontext);
 
-      // Parse the AI response
-      const {
-        names: final_users,
-        texts: final_reasons,
-        images,
-      } = await extractNamesAndTexts(generatedobject);
+        // Parse the AI response
+        const {
+          names: final_users,
+          texts: final_reasons,
+          images,
+        } = await extractNamesAndTexts(generatedobject);
 
-      // Create Person objects from final_users
-      const persons: Person[] = final_users.map((name, index) => ({
-        id: index.toString(),
-        name: name,
-        img: images[index] !== "none" ? images[index] : "",
-        // Add other required fields for Person type if necessary
-      }));
+        // Create Person objects from final_users
+        const persons: Person[] = final_users.map((name, index) => ({
+          id: index.toString(),
+          name: name,
+          img: images[index] !== "none" ? images[index] : "",
+          // Add other required fields for Person type if necessary
+        }));
 
-      // Join final_reasons into a single string for rendering
+        // Join final_reasons into a single string for rendering
 
-      return { persons, rendered_answer: final_reasons };
+        return { persons, rendered_answer: final_reasons };
+      } else {
+        const persons: Person[] = [];
+        const rendered_answer: string[] = ["EMPTY CREDITS"];
+
+        return { persons, rendered_answer };
+      }
     } else {
       const persons: Person[] = [];
-      const rendered_answer: string[] = ["EMPTY CREDITS"];
-
+      const rendered_answer: string[] = ["INAPPROPRIATE REQUEST"];
       return { persons, rendered_answer };
     }
   };

@@ -1,11 +1,13 @@
 "use server";
 
-import { generateObject } from "ai";
+import { generateObject, generateText } from "ai";
+
 import { openai } from "@ai-sdk/openai";
 import { z } from "zod";
 import { type } from "os";
 import { NotificationsObject, Notification } from "./types";
 import { clerkClient, currentUser } from "@clerk/nextjs/server";
+import { faL } from "@fortawesome/free-solid-svg-icons";
 
 export async function getAIGeneration(input: string, context: string) {
   "use server";
@@ -15,7 +17,7 @@ export async function getAIGeneration(input: string, context: string) {
     model: openai("gpt-4o-mini"),
     temperature: 0.4,
     system: `You are an AI assistant specialized in analyzing profiles of different individuals to answer questions based on the provided data. Your goal is to be kind, helpful, and thorough in your responses. For each question, you will:
-      - Select profiles that are with 100% certainty relevant to the question.
+      - Select profiles that are with 100% certainty relevant to the question. Don't do assumptions if there is no direct link.
       - Provide a thoughtful and complete answer based solely on the information in the selected profiles.
       - Ensure that if no profiles are relevant, you respond with NO MATCH.
       - Your output should only include information from the relevant profiles and should strictly adhere to the provided data without using any external information.`,
@@ -45,7 +47,24 @@ export async function getAIGeneration(input: string, context: string) {
   return { profiles };
 }
 
-export async function ParseAiObject(name: string, reason: string) {}
+export async function relevancyTest(query: string) {
+  const { text } = await generateText({
+    model: openai("gpt-4o-mini"),
+    system: `You are a moderator for a search engine. Given a query, your task is to determine if it is appropriate or inappropriate based on the following criteria:
+      Reject (N): If the query involves personal appearance, relationships, sex, or other non-professional and personal topics.
+      Approve (Y): In the other cases.`,
+
+    prompt: `QUERY: ${query}
+    ANSWER (Y or N):`,
+  });
+
+  if (text == "Y") {
+    return true;
+  }
+  if (text == "N") {
+    return false;
+  }
+}
 
 export const formatContextString = (data: any[]) => {
   return data
