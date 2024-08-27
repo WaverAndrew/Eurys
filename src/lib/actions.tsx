@@ -15,7 +15,7 @@ export async function getAIGeneration(input: string, context: string) {
 
   const { object: profiles } = await generateObject({
     model: openai("gpt-4o-mini"),
-    temperature: 0.4,
+    temperature: 0.3,
     system: `You are an AI assistant specialized in analyzing profiles of different individuals to answer questions based on the provided data. Your goal is to be kind, helpful, and thorough in your responses. For each question, you will:
       - Select profiles that are with 100% certainty relevant to the question. Don't do assumptions if there is no direct link.
       - Provide a thoughtful and complete answer based solely on the information in the selected profiles.
