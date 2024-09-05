@@ -17,7 +17,7 @@ const fontSans = FontSans({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   title: "Linkify",
-  description: "Find your future partner",
+  description: "Find your future business partner, investor or employee",
 };
 
 export default function RootLayout({
